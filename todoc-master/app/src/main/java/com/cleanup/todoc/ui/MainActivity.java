@@ -1,5 +1,6 @@
 package com.cleanup.todoc.ui;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +18,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.cleanup.todoc.Injections.Injection;
+import com.cleanup.todoc.Injections.ViewModelFactory;
 import com.cleanup.todoc.R;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
@@ -24,6 +27,7 @@ import com.cleanup.todoc.model.Task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -33,20 +37,24 @@ import java.util.Date;
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
     /**
+     * Task ViewModel
+     */
+    private TaskViewModel mTaskViewModel;
+    /**
      * List of all projects available in the application
      */
-    private final Project[] allProjects = Project.getAllProjects();
+    private  List<Project> allProjects;
 
     /**
      * List of all current tasks of the application
      */
     @NonNull
-    private final ArrayList<Task> tasks = new ArrayList<>();
+    private  List<Task> tasks = new ArrayList<>();
 
     /**
      * The adapter which handles the list of tasks
      */
-    private final TasksAdapter adapter = new TasksAdapter(tasks, this);
+    private final TasksAdapter adapter=new TasksAdapter(tasks,this);;
 
     /**
      * The sort method to be used to display tasks
@@ -106,6 +114,11 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                 showAddTaskDialog();
             }
         });
+
+        configureViewModel();
+        getTasks();
+        getAllProject();
+
     }
 
     @Override
@@ -129,14 +142,13 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         }
 
         updateTasks();
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onDeleteTask(Task task) {
-        tasks.remove(task);
-        updateTasks();
+        mTaskViewModel.deleteTask(task.getId());
+
     }
 
     /**
@@ -162,9 +174,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             }
             // If both project and name of the task have been set
             else if (taskProject != null) {
-                // TODO: Replace this by id of persisted task
-                long id = (long) (Math.random() * 50000);
-
 
                 Task task = new Task(
                         taskProject.getId(),
@@ -173,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                 );
 
                 addTask(task);
-
                 dialogInterface.dismiss();
             }
             // If name has been set, but project has not been set (this should never occur)
@@ -181,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                 dialogInterface.dismiss();
             }
         }
-        // If dialog is aloready closed
+        // If dialog is already closed
         else {
             dialogInterface.dismiss();
         }
@@ -207,8 +215,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * @param task the task to be added to the list
      */
     private void addTask(@NonNull Task task) {
-        tasks.add(task);
-        updateTasks();
+        mTaskViewModel.createTask(task);
+
     }
 
     /**
@@ -318,5 +326,31 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
          * No sort
          */
         NONE
+    }
+
+    /**
+     * Persistancee method
+     */
+    private void configureViewModel(){
+        ViewModelFactory viewModelFactory= Injection.provideViewModelFactory(this);
+        mTaskViewModel= ViewModelProviders.of(this,viewModelFactory).get(TaskViewModel.class);
+
+    }
+
+    private void updateTaskList(List<Task> tasksList){
+        tasks=tasksList;
+        updateTasks();
+    }
+
+    private void getTasks(){
+        mTaskViewModel.getAllTasks().observe(this,this::updateTaskList);
+    }
+
+    private void updateAllProjects(List<Project> projectList){
+        allProjects=projectList;
+    }
+
+    private void getAllProject(){
+        mTaskViewModel.getAllProject().observe(this,this::updateAllProjects);
     }
 }

@@ -5,6 +5,8 @@ import android.arch.lifecycle.LiveData;
 import com.cleanup.todoc.Database.DAO.ProjectDao;
 import com.cleanup.todoc.model.Project;
 
+import java.util.List;
+
 public class ProjectDataRepository {
 
     private final ProjectDao mProjectDao;
@@ -14,4 +16,6 @@ public class ProjectDataRepository {
     //Getter
 
     public LiveData<Project> getProject(long projectID){return mProjectDao.getProject(projectID);}
+
+    public LiveData<List<Project>> getAllProjects(){return mProjectDao.getAllProject();}
 }

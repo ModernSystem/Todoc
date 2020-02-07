@@ -52,25 +52,17 @@ public abstract class TodocDatabase extends RoomDatabase {
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
                 super.onCreate(db);
 
-                ContentValues contentValues1 = new ContentValues();
-                ContentValues contentValues2 = new ContentValues();
-                ContentValues contentValues3 = new ContentValues();
+                for (Project project : Project.getAllProjects()){
+                    ContentValues contentValues=new ContentValues();
 
-                contentValues1.put("id",1L);
-                contentValues1.put("name","Projet Tartampion");
-                contentValues1.put("color",0xFFEADAD1);
+                    contentValues.put("id",project.getId());
+                    contentValues.put("name",project.getName());
+                    contentValues.put("color",project.getColor());
 
-                contentValues2.put("id",2L);
-                contentValues2.put("name","Projet Lucidia");
-                contentValues2.put("color",0xFFB4CDBA);
+                    db.insert("Project",OnConflictStrategy.IGNORE,contentValues);
 
-                contentValues3.put("id",3L);
-                contentValues3.put("name","Projet Circus");
-                contentValues3.put("color",0xFFA3CED2);
+                }
 
-                db.insert("Project", OnConflictStrategy.IGNORE,contentValues1);
-                db.insert("Project", OnConflictStrategy.IGNORE,contentValues2);
-                db.insert("Project", OnConflictStrategy.IGNORE,contentValues3);
             }
         };
     }

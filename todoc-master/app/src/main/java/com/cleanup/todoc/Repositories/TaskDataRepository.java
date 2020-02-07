@@ -16,6 +16,8 @@ public class TaskDataRepository {
     //Get
     public LiveData<List<Task>> getTask(long projectiD){return mTaskDao.getTask(projectiD);}
 
+    public LiveData<List<Task>> getAllTasks(){return mTaskDao.getAllTask();}
+
     //Create
     public void createTask(Task task){mTaskDao.insertTask(task);}
 
