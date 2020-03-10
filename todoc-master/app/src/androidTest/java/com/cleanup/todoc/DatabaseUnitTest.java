@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 
 @RunWith(AndroidJUnit4.class)
-public class TaskDaoTest {
+public class DatabaseUnitTest {
 
     private TodocDatabase database;
     private static long PROJECT_ID=1L;
@@ -52,7 +52,7 @@ public class TaskDaoTest {
     }
 
     @Test
-    public void insertAndGetUser() throws InterruptedException {
+    public void insertAndGetProject() throws InterruptedException {
         database.projectDao().insertProject(PROJECT_DEMO);
         Project project=TestUtils.getValue(database.projectDao().getProject(PROJECT_ID));
         assertTrue(  project.getId()==PROJECT_DEMO.getId()
@@ -91,7 +91,7 @@ public class TaskDaoTest {
         database.taskDao().insertTask(TASK_DEMO_1);
         database.taskDao().insertTask(TASK_DEMO_2);
         database.taskDao().insertTask(TASK_DEMO_3);
-        database.taskDao().deleteItem(
+        database.taskDao().deleteTask(
                 TestUtils.getValue(database.taskDao().getTask(PROJECT_ID))
                 .get(2)
                 .getId());
@@ -100,5 +100,6 @@ public class TaskDaoTest {
         assertEquals(taskList.size(),2);
         assertFalse(TestUtils.getValue(database.taskDao().getTask(PROJECT_ID)).contains(TASK_DEMO_3));
     }
+
 }
 
